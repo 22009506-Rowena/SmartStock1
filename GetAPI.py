@@ -9,10 +9,6 @@ result_file = 'prediction_result.json'
 
 
 
-total_ribbons = 0
-total_arrows = 0
-total_stars = 0
-
 noofribbons = 3
 noofarrows = 3
 noofstars = 3
@@ -31,9 +27,9 @@ def make_prediction(image_file):
     if response.status_code == 200:
         result = response.json()
         return {
-            "BeautyEnhance":sum(1 for obj in result.get("predictions", []) if obj["tagName"] == "Ribbon" and obj["probability"] >= prediction_threshold),
-            "JointEnhance":sum(1 for obj in result.get("predictions", []) if obj["tagName"] == "Arrow" and obj["probability"] >= prediction_threshold),
-            "BoneEnhance": sum(1 for obj in result.get("predictions", []) if obj["tagName"] == "Star" and obj["probability"] >= prediction_threshold)
+            "BeautyEnhance":noofribbons-sum(1 for obj in result.get("predictions", []) if obj["tagName"] == "Ribbon" and obj["probability"] >= prediction_threshold),
+            "JointEnhance":noofarrows-sum(1 for obj in result.get("predictions", []) if obj["tagName"] == "Arrow" and obj["probability"] >= prediction_threshold),
+            "BoneEnhance": noofstars-sum(1 for obj in result.get("predictions", []) if obj["tagName"] == "Star" and obj["probability"] >= prediction_threshold)
         }
     else:
         return {"Error": f"{response.status_code} - {response.text}"}
@@ -54,7 +50,7 @@ def read_from_json(file_path):
 
 @app.route('/', methods=['POST', 'GET'])
 def detect_objects():
-    global ribbons, arrows, stars
+
     global total_ribbons,total_arrows,total_stars
 
     if request.method == 'POST':
@@ -130,5 +126,6 @@ def retrieve_result():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
