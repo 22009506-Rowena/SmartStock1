@@ -139,7 +139,12 @@ def retrieve_result():
         result_data = read_from_db()
 
         if result_data and "Error" not in result_data:
-            return jsonify(result_data)
+            # Extract data from the result and create the desired JSON format
+            result_json = {
+                "name": ["beauty_enhance", "bone_enhance", "joint_enhance"],
+                "quantity": [result_data.get("beauty_enhance", 0), result_data.get("bone_enhance", 0), result_data.get("joint_enhance", 0)]
+            }
+            return jsonify(result_json)
         else:
             return jsonify({"Error": "Result not found"}), 404
     except Exception as e:
