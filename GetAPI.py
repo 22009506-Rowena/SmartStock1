@@ -275,12 +275,12 @@ def retrieve_result():
         result_data = read_from_db()
 
         if result_data and "Error" not in result_data:
-            # Extract data from the result and create the desired JSON format
+            # Create the desired JSON format
             result_json = {
-                "name": [
-                    {"beauty_enhance": {"quantity": result_data.get("beauty_enhance", 0)}},
-                    {"bone_enhance": {"quantity": result_data.get("bone_enhance", 0)}},
-                    {"joint_enhance": {"quantity": result_data.get("joint_enhance", 0)}}
+                "items": [
+                    {"name": "beauty_enhance", "quantity": result_data.get("beauty_enhance", 0)},
+                    {"name": "bone_enhance", "quantity": result_data.get("bone_enhance", 0)},
+                    {"name": "joint_enhance", "quantity": result_data.get("joint_enhance", 0)}
                 ]
             }
             return jsonify(result_json)
