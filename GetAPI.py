@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 import requests
 import json
@@ -21,9 +20,34 @@ with sqlite3.connect(db_file) as conn:
         )
     ''')
 
-noofribbons = 3
-noofarrows = 3
-noofstars = 3
+def read_from_db():
+    try:
+        with sqlite3.connect(db_file) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM results ORDER BY timestamp DESC LIMIT 1')
+            result_data = cursor.fetchone()
+
+        if result_data:
+            keys = ['beauty_enhance', 'joint_enhance', 'bone_enhance']
+            result_dict = dict(zip(keys, result_data[1:]))  # Exclude the timestamp from the result_dict
+            return result_dict
+        else:
+            return {}
+    except Exception as e:
+        return {"Error": f"Unexpected error: {str(e)}"}
+
+def initialize_counts():
+    result_data = read_from_db()
+    if result_data and "Error" not in result_data:
+        return (
+            result_data.get("beauty_enhance", 3),
+            result_data.get("joint_enhance", 3),
+            result_data.get("bone_enhance", 3)
+        )
+    else:
+        return 3, 3, 3
+
+noofribbons, noofarrows, noofstars = initialize_counts()
 prediction_threshold = 0.90
 
 def make_prediction(image_file):
@@ -133,7 +157,6 @@ def detect_objects():
         </form>
         '''
 
-
 @app.route('/result', methods=['GET'])
 def retrieve_result():
     try:
@@ -154,7 +177,6 @@ def retrieve_result():
             return jsonify({"Error": "Result not found"}), 404
     except Exception as e:
         return jsonify({"Error": f"Unexpected error: {str(e)}"}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True)
